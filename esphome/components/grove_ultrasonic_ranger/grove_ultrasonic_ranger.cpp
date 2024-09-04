@@ -3,7 +3,7 @@
 #include "esphome/core/hal.h"
 
 namespace esphome {
-namespace ultrasonic {
+namespace grove_ultrasonic_ranger {
 
 static const char *const TAG = "ultrasonic.sensor";
 
@@ -68,5 +68,5 @@ float GroveUltrasonicRangerSensorComponent::m_to_us(float m) {
 
 float GroveUltrasonicRangerSensorComponent::get_setup_priority() const { return setup_priority::DATA; }
 
-}  // namespace ultrasonic
+}  // namespace grove_ultrasonic_ranger
 }  // namespace esphome
