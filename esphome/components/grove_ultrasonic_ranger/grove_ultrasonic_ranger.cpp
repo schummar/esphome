@@ -8,7 +8,7 @@ namespace grove_ultrasonic_ranger {
 
 static const char *const TAG = "grove_ultrasonic_ranger.sensor";
 
-void GroveUltrasonicRangerSensorComponent::set_pin(GPIOPin *pin) { pin_ = pin; }
+void GroveUltrasonicRangerSensorComponent::set_pin(InternalGPIOPin *pin) { pin_ = pin; }
 
 void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
   ESP_LOGD(TAG, "Setting timeout. m=%, us=%", timeout_m, m_to_us(timeout_m));
@@ -66,7 +66,8 @@ void GroveUltrasonicRangerSensorComponent::update() {
 
   // ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
 
-  GPIOPin *pin = pin_;
+  ISRInternalGPIOPin _pin = pin_->to_isr();
+  ISRInternalGPIOPin *pin = &_pin;
   pin->pin_mode(gpio::FLAG_OUTPUT);
   pin->digital_write(0);
   delayMicroseconds(2);
