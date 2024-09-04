@@ -10,8 +10,8 @@ from esphome.const import (
     UNIT_MILLIMETER,
 )
 
-ultrasonic_ns = cg.esphome_ns.namespace("grove_ultrasonic_ranger")
-GroveUltrasonicRangerSensorComponent = ultrasonic_ns.class_(
+grove_ultrasonic_ranger_ns = cg.esphome_ns.namespace("grove_ultrasonic_ranger")
+GroveUltrasonicRangerSensorComponent = grove_ultrasonic_ranger_ns.class_(
     "GroveUltrasonicRangerSensorComponent", sensor.Sensor, cg.PollingComponent
 )
 
