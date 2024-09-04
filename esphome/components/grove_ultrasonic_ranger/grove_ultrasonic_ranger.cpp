@@ -1,6 +1,7 @@
 #include "grove_ultrasonic_ranger.h"
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
+#include "Arduino.h"
 
 namespace esphome {
 namespace grove_ultrasonic_ranger {
@@ -22,45 +23,85 @@ void GroveUltrasonicRangerSensorComponent::setup() {
   // pin_isr_ = pin_->to_isr();
 }
 
+static uint32_t MicrosDiff(uint32_t begin, uint32_t end) { return end - begin; }
+
+static uint32_t pulseIn(uint32_t pin, uint32_t state, uint32_t timeout = 1000000L) {
+  uint32_t begin = micros();
+
+  // wait for any previous pulse to end
+  while (digitalRead(pin))
+    if (MicrosDiff(begin, micros()) >= timeout)
+      return 0;
+
+  // wait for the pulse to start
+  while (!digitalRead(pin))
+    if (MicrosDiff(begin, micros()) >= timeout)
+      return 0;
+  uint32_t pulseBegin = micros();
+
+  // wait for the pulse to stop
+  while (digitalRead(pin))
+    if (MicrosDiff(begin, micros()) >= timeout)
+      return 0;
+  uint32_t pulseEnd = micros();
+
+  return MicrosDiff(pulseBegin, pulseEnd);
+}
+
 void GroveUltrasonicRangerSensorComponent::update() {
-  GPIOPin *pin = pin_;
+  // GPIOPin *pin = pin_;
+  int _pin = 20;
 
-  pin->pin_mode(gpio::FLAG_OUTPUT);
-  pin->digital_write(false);
+  pinMode(_pin, OUTPUT);
+  digitalWrite(_pin, LOW);
   delayMicroseconds(2);
-  pin->digital_write(true);
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  digitalWrite(_pin, HIGH);
   delayMicroseconds(5);
-  pin->digital_write(false);
-  pin->pin_mode(gpio::FLAG_INPUT);
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  digitalWrite(_pin, LOW);
+  pinMode(_pin, INPUT);
+  long duration;
+  duration = pulseIn(_pin, HIGH);
+  long RangeInCentimeters;
+  RangeInCentimeters = duration / 29 / 2;
 
-  const uint32_t start = micros();
-  while (micros() - start < timeout_us_ && pin->digital_read())
-    ;
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
 
-  while (micros() - start < timeout_us_ && !pin->digital_read())
-    ;
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  // pin->pin_mode(gpio::FLAG_OUTPUT);
+  // pin->digital_write(false);
+  // delayMicroseconds(2);
+  // pin->digital_write(true);
+  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  // delayMicroseconds(5);
+  // pin->digital_write(false);
+  // pin->pin_mode(gpio::FLAG_INPUT);
+  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  const uint32_t pulse_start = micros();
-  while (micros() - start < timeout_us_ && pin->digital_read())
-    ;
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  // const uint32_t start = micros();
+  // while (micros() - start < timeout_us_ && pin->digital_read())
+  //   ;
+  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  const uint32_t pulse_end = micros();
+  // while (micros() - start < timeout_us_ && !pin->digital_read())
+  //   ;
+  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  ESP_LOGV(TAG, "Echo took %" PRIu32 "µs", pulse_end - pulse_start);
+  // const uint32_t pulse_start = micros();
+  // while (micros() - start < timeout_us_ && pin->digital_read())
+  //   ;
+  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  if (pulse_end - start >= timeout_us_) {
-    ESP_LOGD(TAG, "'%s' - Distance measurement timed out!", this->name_.c_str());
-    this->publish_state(NAN);
-  } else {
-    float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start);
-    ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
-    this->publish_state(result);
-  }
+  // const uint32_t pulse_end = micros();
+
+  // ESP_LOGV(TAG, "Echo took %" PRIu32 "µs", pulse_end - pulse_start);
+
+  // if (pulse_end - start >= timeout_us_) {
+  //   ESP_LOGD(TAG, "'%s' - Distance measurement timed out!", this->name_.c_str());
+  //   this->publish_state(NAN);
+  // } else {
+  //   float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start);
+  //   ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
+  //   this->publish_state(result);
+  // }
 }
 void GroveUltrasonicRangerSensorComponent::dump_config() {
   LOG_SENSOR("", "Ultrasonic Sensor", this);
