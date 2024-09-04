@@ -9,7 +9,7 @@
 namespace esphome {
 namespace ultrasonic {
 
-class UltrasonicSensorComponent : public sensor::Sensor, public PollingComponent {
+class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public PollingComponent {
  public:
   void set_pin(InternalGPIOPin *pin);
   void set_timeout_m(uint32_t timeout_m);
