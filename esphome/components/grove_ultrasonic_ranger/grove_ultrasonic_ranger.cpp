@@ -25,22 +25,22 @@ void GroveUltrasonicRangerSensorComponent::setup() {
 
 static uint32_t MicrosDiff(uint32_t begin, uint32_t end) { return end - begin; }
 
-static uint32_t pulseIn(uint32_t pin, uint32_t state, uint32_t timeout = 1000000L) {
+static uint32_t pulseIn(GPIOPin *pin, uint32_t state, uint32_t timeout = 1000000L) {
   uint32_t begin = micros();
 
   // wait for any previous pulse to end
-  while (digitalRead(pin))
+  while (pin->digital_read())
     if (MicrosDiff(begin, micros()) >= timeout)
       return 0;
 
   // wait for the pulse to start
-  while (!digitalRead(pin))
+  while (!pin->digital_read())
     if (MicrosDiff(begin, micros()) >= timeout)
       return 0;
   uint32_t pulseBegin = micros();
 
   // wait for the pulse to stop
-  while (digitalRead(pin))
+  while (pin->digital_read())
     if (MicrosDiff(begin, micros()) >= timeout)
       return 0;
   uint32_t pulseEnd = micros();
@@ -75,7 +75,7 @@ void GroveUltrasonicRangerSensorComponent::update() {
   pin->pin_mode(gpio::FLAG_INPUT);
 
   long duration;
-  duration = pulseIn(20, HIGH);
+  duration = pulseIn(pin, HIGH);
   long RangeInCentimeters;
   RangeInCentimeters = duration / 29 / 2;
   ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
