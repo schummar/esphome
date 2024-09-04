@@ -24,11 +24,11 @@ void GroveUltrasonicRangerSensorComponent::setup() {
 
 void GroveUltrasonicRangerSensorComponent::update() {
   this->pin_isr_.pin_mode(gpio::FLAG_OUTPUT);
-  this->pin_isr_.digital_write(LOW);
+  this->pin_isr_.digital_write(false);
   delayMicroseconds(2);
-  this->pin_isr_.digital_write(HIGH);
+  this->pin_isr_.digital_write(true);
   delayMicroseconds(5);
-  this->pin_isr_.digital_write(LOW);
+  this->pin_isr_.digital_write(false);
   this->pin_isr_.pin_mode(gpio::FLAG_INPUT);
 
   const uint32_t start = micros();
