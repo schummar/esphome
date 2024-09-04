@@ -49,32 +49,36 @@ static uint32_t pulseIn(uint32_t pin, uint32_t state, uint32_t timeout = 1000000
 }
 
 void GroveUltrasonicRangerSensorComponent::update() {
-  // GPIOPin *pin = pin_;
-  int _pin = 20;
+  // int _pin = 20;
 
-  pinMode(_pin, OUTPUT);
-  digitalWrite(_pin, LOW);
+  // pinMode(_pin, OUTPUT);
+  // digitalWrite(_pin, LOW);
+  // delayMicroseconds(2);
+  // digitalWrite(_pin, HIGH);
+  // delayMicroseconds(5);
+  // digitalWrite(_pin, LOW);
+  // pinMode(_pin, INPUT);
+  // long duration;
+  // duration = pulseIn(_pin, HIGH);
+  // long RangeInCentimeters;
+  // RangeInCentimeters = duration / 29 / 2;
+
+  // ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
+
+  GPIOPin *pin = pin_;
+  pin->pin_mode(gpio::FLAG_OUTPUT);
+  pin->digital_write(0);
   delayMicroseconds(2);
-  digitalWrite(_pin, HIGH);
+  pin->digital_write(1);
   delayMicroseconds(5);
-  digitalWrite(_pin, LOW);
-  pinMode(_pin, INPUT);
+  pin->digital_write(0);
+  pin->pin_mode(gpio::FLAG_INPUT);
+
   long duration;
-  duration = pulseIn(_pin, HIGH);
+  duration = pulseIn(20, HIGH);
   long RangeInCentimeters;
   RangeInCentimeters = duration / 29 / 2;
-
   ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
-
-  // pin->pin_mode(gpio::FLAG_OUTPUT);
-  // pin->digital_write(false);
-  // delayMicroseconds(2);
-  // pin->digital_write(true);
-  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
-  // delayMicroseconds(5);
-  // pin->digital_write(false);
-  // pin->pin_mode(gpio::FLAG_INPUT);
-  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
   // const uint32_t start = micros();
   // while (micros() - start < timeout_us_ && pin->digital_read())
