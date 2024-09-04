@@ -19,7 +19,7 @@ class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public Polli
   float get_setup_priority() const override;
 
  protected:
-  static float us_to_m(uint32_t us);
+  static float us_to_mm(uint32_t us);
   static float m_to_us(float m);
 
   InternalGPIOPin *pin_;

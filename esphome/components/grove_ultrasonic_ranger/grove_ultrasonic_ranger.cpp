@@ -19,36 +19,36 @@ void GroveUltrasonicRangerSensorComponent::setup() {
 }
 
 void GroveUltrasonicRangerSensorComponent::update() {
-  ISRInternalGPIOPin _pin = pin_->to_isr();
-  ISRInternalGPIOPin *pin = &_pin;
-  pin->pin_mode(gpio::FLAG_OUTPUT);
-  pin->digital_write(0);
+  pin_isr_.pin_mode(gpio::FLAG_OUTPUT);
+  pin_isr_.digital_write(0);
   delayMicroseconds(2);
-  pin->digital_write(1);
+  pin_isr_.digital_write(1);
   delayMicroseconds(5);
-  pin->digital_write(0);
-  pin->pin_mode(gpio::FLAG_INPUT);
+  pin_isr_.digital_write(0);
+  pin_isr_.pin_mode(gpio::FLAG_INPUT);
 
-  const uint32_t start = micros();
+  const uint32_t threshold = micros() + timeout_us_;
 
-  while (micros() - start < timeout_us_ && pin->digital_read())
+  while (micros() < threshold && pin_isr_.digital_read())
     ;
 
-  while (micros() - start < timeout_us_ && !pin->digital_read())
+  while (micros() < threshold && !pin_isr_.digital_read())
     ;
+
   const uint32_t pulse_start = micros();
-  while (micros() - start < timeout_us_ && pin->digital_read())
+
+  while (micros() < threshold && pin_isr_.digital_read())
     ;
 
   const uint32_t pulse_end = micros();
 
   ESP_LOGV(TAG, "Echo took %" PRIu32 "µs", pulse_end - pulse_start);
 
-  if (pulse_end - start >= timeout_us_) {
+  if (pulse_end >= threshold) {
     ESP_LOGD(TAG, "'%s' - Distance measurement timed out!", this->name_.c_str());
     this->publish_state(NAN);
   } else {
-    float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start) * 1000;
+    float result = us_to_mm(pulse_end - pulse_start);
     ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
     this->publish_state(result);
   }
@@ -60,11 +60,13 @@ void GroveUltrasonicRangerSensorComponent::dump_config() {
   LOG_UPDATE_INTERVAL(this);
 }
 
-float GroveUltrasonicRangerSensorComponent::us_to_m(uint32_t us) {
+float GroveUltrasonicRangerSensorComponent::get_setup_priority() const { return setup_priority::DATA; }
+
+float GroveUltrasonicRangerSensorComponent::us_to_mm(uint32_t us) {
   const float speed_sound_m_per_s = 343.0f;
   const float time_s = us / 1e6f;
   const float total_dist = time_s * speed_sound_m_per_s;
-  return total_dist / 2.0f;
+  return total_dist / 2.0f * 1000;
 }
 
 float GroveUltrasonicRangerSensorComponent::m_to_us(float m) {
@@ -72,8 +74,6 @@ float GroveUltrasonicRangerSensorComponent::m_to_us(float m) {
   const float time_s = m / speed_sound_m_per_s;
   return time_s * 1e6f;
 }
-
-float GroveUltrasonicRangerSensorComponent::get_setup_priority() const { return setup_priority::DATA; }
 
 }  // namespace grove_ultrasonic_ranger
 }  // namespace esphome
