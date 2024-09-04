@@ -83,14 +83,13 @@ void GroveUltrasonicRangerSensorComponent::update() {
 
   const uint32_t start = micros();
 
-  while (pin->digital_read())
+  while (micros() - start < timeout_us_ && pin->digital_read())
     ;
 
-  while (!pin->digital_read())
+  while (micros() - start < timeout_us_ && !pin->digital_read())
     ;
-
   const uint32_t pulse_start = micros();
-  while (pin->digital_read())
+  while (micros() - start < timeout_us_ && pin->digital_read())
     ;
 
   const uint32_t pulse_end = micros();
