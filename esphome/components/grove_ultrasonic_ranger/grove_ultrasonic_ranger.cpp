@@ -30,6 +30,7 @@ void GroveUltrasonicRangerSensorComponent::update() {
   delayMicroseconds(5);
   this->pin_isr_.digital_write(false);
   this->pin_isr_.pin_mode(gpio::FLAG_INPUT);
+  ESP_LOGD(TAG, "state=%d", pin_isr_.digital_read());
 
   const uint32_t start = micros();
   while (micros() - start < timeout_us_ && pin_isr_.digital_read())
