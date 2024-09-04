@@ -49,7 +49,7 @@ void GroveUltrasonicRangerSensorComponent::update() {
     this->publish_state(NAN);
   } else {
     float result = us_to_mm(pulse_end - pulse_start);
-    ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
+    ESP_LOGD(TAG, "'%s' - Got distance: %.3f mm", this->name_.c_str(), result);
     this->publish_state(result);
   }
 }
