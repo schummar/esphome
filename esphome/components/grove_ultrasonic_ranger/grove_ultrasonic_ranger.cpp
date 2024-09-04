@@ -9,7 +9,10 @@ static const char *const TAG = "ultrasonic.sensor";
 
 void GroveUltrasonicRangerSensorComponent::set_pin(InternalGPIOPin *pin) { pin_ = pin; }
 
-void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) { timeout_us_ = us_to_m(timeout_m); }
+void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
+  ESP_LOGD(TAG, "Setting timeout. m=%, us=%", timeout_m, m_to_us(timeout_m));
+  timeout_us_ = us_to_m(timeout_m);
+}
 
 void GroveUltrasonicRangerSensorComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Ultrasonic Sensor...");
