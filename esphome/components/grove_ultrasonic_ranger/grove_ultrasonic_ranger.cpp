@@ -14,6 +14,7 @@ void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
   ESP_LOGD(TAG, "Setting timeout. m=%, us=%", timeout_m, m_to_us(timeout_m));
   this->timeout_m_ = timeout_m;
   timeout_us_ = m_to_us(timeout_m) * 2;
+  timeout_us_ = 1000000L;
 }
 
 void GroveUltrasonicRangerSensorComponent::setup() {
@@ -74,38 +75,38 @@ void GroveUltrasonicRangerSensorComponent::update() {
   pin->digital_write(0);
   pin->pin_mode(gpio::FLAG_INPUT);
 
-  long duration;
-  duration = pulseIn(pin, HIGH);
-  long RangeInCentimeters;
-  RangeInCentimeters = duration / 29 / 2;
-  ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
+  // long duration;
+  // duration = pulseIn(pin, HIGH);
+  // long RangeInCentimeters;
+  // RangeInCentimeters = duration / 29 / 2;
+  // ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
 
-  // const uint32_t start = micros();
-  // while (micros() - start < timeout_us_ && pin->digital_read())
-  //   ;
-  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  const uint32_t start = micros();
+  while (micros() - start < timeout_us_ && pin->digital_read())
+    ;
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  // while (micros() - start < timeout_us_ && !pin->digital_read())
-  //   ;
-  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  while (micros() - start < timeout_us_ && !pin->digital_read())
+    ;
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  // const uint32_t pulse_start = micros();
-  // while (micros() - start < timeout_us_ && pin->digital_read())
-  //   ;
-  // ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  const uint32_t pulse_start = micros();
+  while (micros() - start < timeout_us_ && pin->digital_read())
+    ;
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  // const uint32_t pulse_end = micros();
+  const uint32_t pulse_end = micros();
 
-  // ESP_LOGV(TAG, "Echo took %" PRIu32 "µs", pulse_end - pulse_start);
+  ESP_LOGV(TAG, "Echo took %" PRIu32 "µs", pulse_end - pulse_start);
 
-  // if (pulse_end - start >= timeout_us_) {
-  //   ESP_LOGD(TAG, "'%s' - Distance measurement timed out!", this->name_.c_str());
-  //   this->publish_state(NAN);
-  // } else {
-  //   float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start);
-  //   ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
-  //   this->publish_state(result);
-  // }
+  if (pulse_end - start >= timeout_us_) {
+    ESP_LOGD(TAG, "'%s' - Distance measurement timed out!", this->name_.c_str());
+    this->publish_state(NAN);
+  } else {
+    float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start);
+    ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
+    this->publish_state(result);
+  }
 }
 void GroveUltrasonicRangerSensorComponent::dump_config() {
   LOG_SENSOR("", "Ultrasonic Sensor", this);
