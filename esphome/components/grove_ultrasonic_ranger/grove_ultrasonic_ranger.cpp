@@ -12,7 +12,7 @@ void GroveUltrasonicRangerSensorComponent::set_pin(InternalGPIOPin *pin) { pin_ 
 void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
   ESP_LOGD(TAG, "Setting timeout. m=%, us=%", timeout_m, m_to_us(timeout_m));
   this->timeout_m_ = timeout_m;
-  timeout_us_ = us_to_m(timeout_m);
+  timeout_us_ = m_to_us(timeout_m);
 }
 
 void GroveUltrasonicRangerSensorComponent::setup() {
