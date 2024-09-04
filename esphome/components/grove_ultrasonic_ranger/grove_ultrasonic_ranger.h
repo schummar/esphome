@@ -26,6 +26,7 @@ class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public Polli
   InternalGPIOPin *pin_;
   ISRInternalGPIOPin pin_isr_;
   uint32_t timeout_us_{};
+  uint32_t timeout_m_ = -1;
 };
 
 }  // namespace grove_ultrasonic_ranger
