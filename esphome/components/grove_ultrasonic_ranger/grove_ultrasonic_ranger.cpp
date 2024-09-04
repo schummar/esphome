@@ -82,18 +82,35 @@ void GroveUltrasonicRangerSensorComponent::update() {
   // ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
 
   const uint32_t start = micros();
+
+  // wait for any previous pulse to end
   while (pin->digital_read())
     ;
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  // if (MicrosDiff(start, micros()) >= timeout)
+  //   return 0;
 
+  // wait for the pulse to start
   while (!pin->digital_read())
     ;
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  // if (MicrosDiff(start, micros()) >= timeout)
+  //   return 0;
+  uint32_t pulse_start = micros();
 
-  const uint32_t pulse_start = micros();
+  // wait for the pulse to stop
   while (pin->digital_read())
     ;
-  ESP_LOGD(TAG, "state=%d", pin->digital_read());
+  // if (MicrosDiff(start, micros()) >= timeout)
+  //   return 0;
+
+  // while (pin->digital_read())
+  //   ;
+
+  // while (!pin->digital_read())
+  //   ;
+
+  // const uint32_t pulse_start = micros();
+  // while (pin->digital_read())
+  //   ;
 
   const uint32_t pulse_end = micros();
 
