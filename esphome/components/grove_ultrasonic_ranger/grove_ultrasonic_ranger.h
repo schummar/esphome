@@ -10,7 +10,7 @@ namespace grove_ultrasonic_ranger {
 
 class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public PollingComponent {
  public:
-  void set_pin(GPIOPin *pin);
+  void set_pin(InternalGPIOPin *pin);
   void set_timeout_m(uint32_t timeout_m);
 
   void setup() override;
@@ -22,7 +22,7 @@ class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public Polli
   static float us_to_m(uint32_t us);
   static float m_to_us(float m);
 
-  GPIOPin *pin_;
+  InternalGPIOPin *pin_;
   uint32_t timeout_us_{};
   uint32_t timeout_m_ = -1;
 };
