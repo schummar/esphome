@@ -18,16 +18,18 @@ void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
 void GroveUltrasonicRangerSensorComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Ultrasonic Sensor...");
   pin_->setup();
-  pin_->digital_write(false);
+  // pin_->digital_write(false);
   pin_isr_ = pin_->to_isr();
 }
 
 void GroveUltrasonicRangerSensorComponent::update() {
-  this->pin_isr_.digital_write(false);
+  this->pin_isr_.pin_mode(gpio::FLAG_OUTPUT);
+  this->pin_isr_.digital_write(LOW);
   delayMicroseconds(2);
-  this->pin_isr_.digital_write(true);
+  this->pin_isr_.digital_write(HIGH);
   delayMicroseconds(5);
-  this->pin_isr_.digital_write(false);
+  this->pin_isr_.digital_write(LOW);
+  this->pin_isr_.pin_mode(gpio::FLAG_INPUT);
 
   const uint32_t start = micros();
   while (micros() - start < timeout_us_ && pin_isr_.digital_read())
