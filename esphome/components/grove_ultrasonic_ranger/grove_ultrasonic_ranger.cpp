@@ -23,28 +23,30 @@ void GroveUltrasonicRangerSensorComponent::setup() {
 }
 
 void GroveUltrasonicRangerSensorComponent::update() {
-  this->pin_isr_.pin_mode(gpio::FLAG_OUTPUT);
-  this->pin_isr_.digital_write(false);
+  GPIOPin *pin = pin_;
+
+  pin->pin_mode(gpio::FLAG_OUTPUT);
+  pin->digital_write(false);
   delayMicroseconds(2);
-  this->pin_isr_.digital_write(true);
+  pin->digital_write(true);
   delayMicroseconds(5);
-  this->pin_isr_.digital_write(false);
-  this->pin_isr_.pin_mode(gpio::FLAG_INPUT);
-  ESP_LOGD(TAG, "state=%d", pin_isr_.digital_read());
+  pin->digital_write(false);
+  pin->pin_mode(gpio::FLAG_INPUT);
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
   const uint32_t start = micros();
-  while (micros() - start < timeout_us_ && pin_isr_.digital_read())
+  while (micros() - start < timeout_us_ && pin->digital_read())
     ;
-  ESP_LOGD(TAG, "state=%d", pin_isr_.digital_read());
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
-  while (micros() - start < timeout_us_ && !pin_isr_.digital_read())
+  while (micros() - start < timeout_us_ && !pin->digital_read())
     ;
-  ESP_LOGD(TAG, "state=%d", pin_isr_.digital_read());
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
   const uint32_t pulse_start = micros();
-  while (micros() - start < timeout_us_ && pin_isr_.digital_read())
+  while (micros() - start < timeout_us_ && pin->digital_read())
     ;
-  ESP_LOGD(TAG, "state=%d", pin_isr_.digital_read());
+  ESP_LOGD(TAG, "state=%d", pin->digital_read());
 
   const uint32_t pulse_end = micros();
 
