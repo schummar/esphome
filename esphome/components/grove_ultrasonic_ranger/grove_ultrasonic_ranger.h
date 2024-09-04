@@ -7,7 +7,7 @@
 #include <cinttypes>
 
 namespace esphome {
-namespace ultrasonic {
+namespace grove_ultrasonic_ranger {
 
 class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public PollingComponent {
  public:
@@ -28,5 +28,5 @@ class GroveUltrasonicRangerSensorComponent : public sensor::Sensor, public Polli
   uint32_t timeout_us_{};
 };
 
-}  // namespace ultrasonic
+}  // namespace grove_ultrasonic_ranger
 }  // namespace esphome
