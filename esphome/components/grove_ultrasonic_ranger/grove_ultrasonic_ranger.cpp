@@ -10,62 +10,15 @@ static const char *const TAG = "grove_ultrasonic_ranger.sensor";
 
 void GroveUltrasonicRangerSensorComponent::set_pin(InternalGPIOPin *pin) { pin_ = pin; }
 
-void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
-  ESP_LOGD(TAG, "Setting timeout. m=%, us=%", timeout_m, m_to_us(timeout_m));
-  this->timeout_m_ = timeout_m;
-  timeout_us_ = m_to_us(timeout_m) * 2;
-  // timeout_us_ = 1000000L;
-}
+void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) { timeout_us_ = m_to_us(timeout_m) * 2; }
 
 void GroveUltrasonicRangerSensorComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Ultrasonic Sensor...");
   pin_->setup();
-  // pin_->digital_write(false);
-  // pin_isr_ = pin_->to_isr();
-}
-
-static uint32_t MicrosDiff(uint32_t begin, uint32_t end) { return end - begin; }
-
-static uint32_t pulseIn(GPIOPin *pin, uint32_t state, uint32_t timeout = 1000000L) {
-  uint32_t begin = micros();
-
-  // wait for any previous pulse to end
-  while (pin->digital_read())
-    if (MicrosDiff(begin, micros()) >= timeout)
-      return 0;
-
-  // wait for the pulse to start
-  while (!pin->digital_read())
-    if (MicrosDiff(begin, micros()) >= timeout)
-      return 0;
-  uint32_t pulseBegin = micros();
-
-  // wait for the pulse to stop
-  while (pin->digital_read())
-    if (MicrosDiff(begin, micros()) >= timeout)
-      return 0;
-  uint32_t pulseEnd = micros();
-
-  return MicrosDiff(pulseBegin, pulseEnd);
+  pin_isr_ = pin_->to_isr();
 }
 
 void GroveUltrasonicRangerSensorComponent::update() {
-  // int _pin = 20;
-
-  // pinMode(_pin, OUTPUT);
-  // digitalWrite(_pin, LOW);
-  // delayMicroseconds(2);
-  // digitalWrite(_pin, HIGH);
-  // delayMicroseconds(5);
-  // digitalWrite(_pin, LOW);
-  // pinMode(_pin, INPUT);
-  // long duration;
-  // duration = pulseIn(_pin, HIGH);
-  // long RangeInCentimeters;
-  // RangeInCentimeters = duration / 29 / 2;
-
-  // ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
-
   ISRInternalGPIOPin _pin = pin_->to_isr();
   ISRInternalGPIOPin *pin = &_pin;
   pin->pin_mode(gpio::FLAG_OUTPUT);
@@ -75,12 +28,6 @@ void GroveUltrasonicRangerSensorComponent::update() {
   delayMicroseconds(5);
   pin->digital_write(0);
   pin->pin_mode(gpio::FLAG_INPUT);
-
-  // long duration;
-  // duration = pulseIn(pin, HIGH);
-  // long RangeInCentimeters;
-  // RangeInCentimeters = duration / 29 / 2;
-  // ESP_LOGD(TAG, "Distance: %d cm", RangeInCentimeters);
 
   const uint32_t start = micros();
 
@@ -101,7 +48,7 @@ void GroveUltrasonicRangerSensorComponent::update() {
     ESP_LOGD(TAG, "'%s' - Distance measurement timed out!", this->name_.c_str());
     this->publish_state(NAN);
   } else {
-    float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start);
+    float result = GroveUltrasonicRangerSensorComponent::us_to_m(pulse_end - pulse_start) * 1000;
     ESP_LOGD(TAG, "'%s' - Got distance: %.3f m", this->name_.c_str(), result);
     this->publish_state(result);
   }
@@ -110,7 +57,6 @@ void GroveUltrasonicRangerSensorComponent::dump_config() {
   LOG_SENSOR("", "Ultrasonic Sensor", this);
   LOG_PIN("  Pin: ", this->pin_);
   ESP_LOGCONFIG(TAG, "  Timeout: %" PRIu32 " µs", this->timeout_us_);
-  ESP_LOGCONFIG(TAG, "  Timeout m: %" PRIu32 " m", this->timeout_m_);
   LOG_UPDATE_INTERVAL(this);
 }
 
