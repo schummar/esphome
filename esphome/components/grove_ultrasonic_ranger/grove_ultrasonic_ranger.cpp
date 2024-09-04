@@ -5,21 +5,21 @@
 namespace esphome {
 namespace grove_ultrasonic_ranger {
 
-static const char *const TAG = "ultrasonic.sensor";
+static const char *const TAG = "grove_ultrasonic_ranger.sensor";
 
-void GroveUltrasonicRangerSensorComponent::set_pin(InternalGPIOPin *pin) { pin_ = pin; }
+void GroveUltrasonicRangerSensorComponent::set_pin(GPIOPin *pin) { pin_ = pin; }
 
 void GroveUltrasonicRangerSensorComponent::set_timeout_m(uint32_t timeout_m) {
   ESP_LOGD(TAG, "Setting timeout. m=%, us=%", timeout_m, m_to_us(timeout_m));
   this->timeout_m_ = timeout_m;
-  timeout_us_ = m_to_us(timeout_m);
+  timeout_us_ = m_to_us(timeout_m) * 2;
 }
 
 void GroveUltrasonicRangerSensorComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Ultrasonic Sensor...");
   pin_->setup();
   // pin_->digital_write(false);
-  pin_isr_ = pin_->to_isr();
+  // pin_isr_ = pin_->to_isr();
 }
 
 void GroveUltrasonicRangerSensorComponent::update() {
