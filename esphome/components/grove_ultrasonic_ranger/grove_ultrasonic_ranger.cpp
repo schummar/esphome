@@ -1,7 +1,7 @@
 #include "grove_ultrasonic_ranger.h"
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
-#include "Arduino.h"
+#include <cmath>
 
 namespace esphome {
 namespace grove_ultrasonic_ranger {

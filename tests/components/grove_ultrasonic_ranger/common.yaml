@@ -1,0 +1,7 @@
+sensor:
+  - platform: grove_ultrasonic_ranger
+    id: grove_ultrasonic_ranger_sensor
+    name: Grove Ultrasonic Ranger
+    pin: 4
+    timeout: 3m
+    update_interval: 5s
